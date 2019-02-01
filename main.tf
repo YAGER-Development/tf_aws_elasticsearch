@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "es_management_access" {
     principals {
       type = "AWS"
 
-      identifiers = ["${distinct(compact(var.management_iam_roles))}"]
+      identifiers = ["*"]
     }
 
     condition {
@@ -23,6 +23,27 @@ data "aws_iam_policy_document" "es_management_access" {
       variable = "aws:SourceIp"
 
       values = ["${distinct(compact(var.management_public_ip_addresses))}"]
+    }
+  }
+  statement {
+    actions = [
+      
+        "es:ESHttpDelete",
+        "es:ESHttpGet",
+        "es:ESHttpHead",
+        "es:ESHttpPost",
+        "es:ESHttpPut"
+    ]
+
+    resources = [
+      "${aws_elasticsearch_domain.es.arn}",
+      "${aws_elasticsearch_domain.es.arn}/*",
+    ]
+
+    principals {
+      type = "AWS"
+
+      identifiers = ["${distinct(compact(var.shipper_iam_roles))}"]
     }
   }
 }
